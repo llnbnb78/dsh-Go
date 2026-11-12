@@ -1,0 +1,22 @@
+name: iOS build check
+on:
+  workflow_dispatch:
+jobs:
+  build-ios:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.7'
+          channel: stable
+      - name: Generate iOS project
+        run: bash tooling/ios/bootstrap.sh
+      - name: Compile unsigned iOS app
+        run: |
+          cd app
+          flutter build ios --release --no-codesign
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh-go-ios-build-check
+          path: app/build/ios/iphoneos/Runner.app
